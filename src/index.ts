@@ -9,9 +9,24 @@ const app  = express()
 const PORT = Number(process.env.PORT) || 3000
 
 // ── Middleware ───────────────────────────────────────────────────────────────
+app.set('trust proxy', 1)
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,        // e.g. https://app.yourdomain.com
+  'capacitor://localhost',          // Capacitor Android/iOS
+  'http://localhost',               // Capacitor fallback
+  'http://localhost:8080',          // local dev
+]
 app.use(cors({
-  origin:      process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (Android WebView often sends none)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`)
+      callback(new Error(`CORS blocked: ${origin}`))
+    }
+  },
   credentials: true,
 }))
 app.use(express.json())
