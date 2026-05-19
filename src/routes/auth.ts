@@ -4,10 +4,73 @@ import passport from '../config/passport'
 import UserModel, { User } from '../models/UserModel'
 import { signToken } from '../utils/jwt'
 import { requireAuth } from '../middleware/auth'
+import { OAuth2Client } from 'google-auth-library'
 
 const router = Router()
 
 // ─── Google OAuth ──────────────────────────────────────────────────────────
+// ─── Google OAuth – Mobile (Capacitor plugin) ──────────────────────────────
+
+/**
+ * POST /auth/google/mobile
+ * Called by the Capacitor @capawesome/capacitor-google-sign-in plugin.
+ * Body: { idToken } or { serverAuthCode }
+ */
+router.post('/google/mobile', async (req: Request, res: Response) => {
+  const { idToken, serverAuthCode } = req.body as {
+    idToken?: string
+    serverAuthCode?: string
+  }
+
+  if (!idToken && !serverAuthCode) {
+    res.status(400).json({ message: 'idToken ou serverAuthCode requis.' })
+    return
+  }
+
+  try {
+    const client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      'postmessage' // required for mobile serverAuthCode exchange
+    )
+
+    let email: string
+    let name: string
+
+    if (serverAuthCode) {
+      // Exchange serverAuthCode → get tokens from Google
+      const { tokens } = await client.getToken(serverAuthCode)
+      if (!tokens.id_token) throw new Error('No id_token in exchange response')
+
+      const ticket = await client.verifyIdToken({
+        idToken:  tokens.id_token,
+        audience: process.env.GOOGLE_CLIENT_ID!,
+      })
+      const payload = ticket.getPayload()!
+      email = payload.email!
+      name  = payload.name || email
+    } else {
+      // Verify idToken directly (simpler, slightly less secure)
+      const ticket = await client.verifyIdToken({
+        idToken:  idToken!,
+        audience: process.env.GOOGLE_CLIENT_ID!,
+      })
+      const payload = ticket.getPayload()!
+      email = payload.email!
+      name  = payload.name || email
+    }
+
+    // Reuse your existing upsert logic — same as passport.ts
+    const user  = await UserModel.upsertGoogleUser({ name, email })
+    const token = signToken(user)
+
+    res.json({ token, user: UserModel.sanitize(user) })
+  } catch (err) {
+    console.error('Mobile Google auth error:', err)
+    res.status(401).json({ message: 'Authentification Google invalide.' })
+  }
+})
+
 
 /**
  * GET /auth/google
