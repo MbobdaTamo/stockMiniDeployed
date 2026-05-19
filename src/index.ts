@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT) || 3000
 
 // ── Middleware ───────────────────────────────────────────────────────────────
 app.set('trust proxy', 1)
-
+console.log(process.env.FRONTEND_URL)
 const allowedOrigins = [
   process.env.FRONTEND_URL,        // e.g. https://app.yourdomain.com
   'capacitor://localhost',          // Capacitor Android/iOS
