@@ -42,7 +42,7 @@ app.use(cookieParser())
 
 app.use(express.json({ limit: '10mb' }))
 // Serve Vue app
-app.use(express.static(path.join(__dirname, '..','public')))
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 
 app.use('/auth', authRouter)
@@ -50,6 +50,8 @@ app.use('/auth', authRouter)
 app.get('/health', (_req, res) => res.json({ status: 'ok' }))
 
 app.use('/sync', syncRouter)
+
+app.use(express.static(path.join(__dirname, '..','public')))
 // ── 404 ──────────────────────────────────────────────────────────────────────
 
 app.use((_req, res) => res.status(404).json({ message: 'Route introuvable.' }))
