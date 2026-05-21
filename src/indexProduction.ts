@@ -52,6 +52,12 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }))
 app.use('/sync', syncRouter)
 
 app.use(express.static(path.join(__dirname, '..','public')))
+app.get('*', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..','public', 'index.html')
+  )
+})
+
 // ── 404 ──────────────────────────────────────────────────────────────────────
 
 app.use((_req, res) => res.status(404).json({ message: 'Route introuvable.' }))
