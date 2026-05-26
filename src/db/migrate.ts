@@ -19,12 +19,27 @@ async function migrate(): Promise<void> {
         PRIMARY KEY (id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `)
+
     console.log('✅  Table `user` is ready.')
+
+    await conn.execute(`
+      ALTER TABLE user
+      ADD COLUMN IF NOT EXISTS premiumExpireAt DATETIME NULL;
+    `)
+
+    // Set default for existing users who don't have it yet
+    await conn.execute(`
+      UPDATE user
+      SET premiumExpireAt = DATE_ADD(NOW(), INTERVAL 1 MONTH)
+      WHERE premiumExpireAt IS NULL;
+    `)
+
   } finally {
     conn.release()
     await pool.end()
   }
 }
+
 
 migrate().catch((err) => {
   console.error('Migration failed:', err)

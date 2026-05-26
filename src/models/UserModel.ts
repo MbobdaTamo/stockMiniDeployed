@@ -10,6 +10,7 @@ export interface User {
   login:    string | null
   email:    string
   shopId:   string | null   // UUID string, generated on first Google login
+  premiumExpireAt: Date | null
 }
 
 type UserRow = User & RowDataPacket
@@ -38,9 +39,17 @@ export const UserModel = {
   },
 
   async create(data: Omit<User, 'id'>): Promise<number> {
+    // Compute 1 month from now
+    const premiumExpireAt = new Date()
+    premiumExpireAt.setMonth(premiumExpireAt.getMonth() + 1)
+
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO user (name, type, password, login, email, shopId) VALUES (?,?,?,?,?,?)',
-      [data.name, data.type, data.password, data.login, data.email, data.shopId ?? null]
+      `INSERT INTO user
+        (name, type, password, login, email, shopId, premiumExpireAt)
+      VALUES (?,?,?,?,?,?,?)`,
+      [data.name, data.type, data.password, data.login,
+      data.email, data.shopId ?? null,
+      premiumExpireAt.toISOString().slice(0, 19).replace('T', ' ')]
     )
     return result.insertId
   },
