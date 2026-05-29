@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import './config/passport'           // register Google strategy
 import authRouter from './routes/auth'
 import syncRouter from './routes/sync'
+import adminRouter from './routes/admin'
 import path from 'path'
 
 // production
@@ -50,6 +51,8 @@ app.use('/auth', authRouter)
 app.get('/health', (_req, res) => res.json({ status: 'ok' }))
 
 app.use('/sync', syncRouter)
+
+app.use('/admin', adminRouter)
 
 app.use(express.static(path.join(__dirname, '..','public')))
 app.get('*', (req, res) => {

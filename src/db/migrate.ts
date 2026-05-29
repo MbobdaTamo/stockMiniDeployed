@@ -11,7 +11,7 @@ async function migrate(): Promise<void> {
       CREATE TABLE IF NOT EXISTS user (
         id       INT           NOT NULL AUTO_INCREMENT,
         name     VARCHAR(120)  NOT NULL,
-        type     ENUM('admin','casher') NOT NULL DEFAULT 'casher',
+        type     ENUM('admin','casher', 'superAdmin') NOT NULL DEFAULT 'casher',
         password VARCHAR(255)  NULL     COMMENT 'NULL for Google-only accounts',
         login    VARCHAR(80)   NULL     UNIQUE,
         email    VARCHAR(180)  NOT NULL UNIQUE,
@@ -33,6 +33,25 @@ async function migrate(): Promise<void> {
       SET premiumExpireAt = DATE_ADD(NOW(), INTERVAL 1 MONTH)
       WHERE premiumExpireAt IS NULL;
     `)
+    // Add super admin ----------------------
+    await conn.execute(`
+      ALTER TABLE user
+      MODIFY COLUMN type ENUM('admin', 'casher', 'superAdmin') NOT NULL DEFAULT 'casher';
+    `)
+    // Create super admin manually ----------------------
+    await conn.execute(`
+      INSERT INTO user (name, type, login, email, password, shopId, premiumExpireAt)
+        VALUES (
+          'Super Admin',
+          'superAdmin',
+          'superadmin',
+          'superadmin@stockware.app',
+          '$2a$12$ek0W1Q9JUolHsqTB479nDev2jZxjfEEAck7Sl6ZsK69LAOX.O/udO',
+          NULL,
+          NULL
+        );
+    `)
+    // generate hash password:  node -e "require('bcryptjs').hash('dembele2000', 12).then(console.log)"
 
   } finally {
     conn.release()

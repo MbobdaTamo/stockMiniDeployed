@@ -5,7 +5,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2'
 export interface User {
   id:       number
   name:     string
-  type:     'admin' | 'casher'
+  type: 'admin' | 'casher' | 'superAdmin'
   password: string | null
   login:    string | null
   email:    string
