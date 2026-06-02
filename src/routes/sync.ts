@@ -50,7 +50,15 @@ router.post('/push', requireAuth, async (req: Request | any, res: Response) => {
 // ── GET /sync/pull ─────────────────────────────────────────────────────────────
 // Returns the last saved JSON so the client can restore its IndexedDB.
 
-router.get('/pull', requireAuth, (req: Request | any, res: Response) => {
+router.get('/pull', requireAuth, async (req: Request | any, res: Response) => {
+  // check if premium is activated
+  const premiumExpireAt:any = await getPremiumExpireAt(req.user.sub)
+  const expireAt = new Date(premiumExpireAt);
+
+  if (expireAt < new Date()) {
+    return res.status(401).json({ ok: false, error: '401 Unauthorized' })
+  }
+
   const DB_PATH = path.resolve(process.cwd(), 'data', req.user.shopId)
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
 

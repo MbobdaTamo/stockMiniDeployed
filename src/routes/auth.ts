@@ -95,7 +95,7 @@ router.get(
     const user  = req.user as User
     const token = signToken(user)
     // Redirect to frontend — token in query param, frontend grabs and stores it
-    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}&shopId=${user.shopId}`)
+    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}&shopId=${user.shopId}&premiumExpireAt=${user.premiumExpireAt}`)
   }
 )
 
