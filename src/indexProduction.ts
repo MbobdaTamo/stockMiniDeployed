@@ -92,8 +92,8 @@ const startServer = async () => {
 
   try {
     // HTTPS Server Configuration
-    const keyCert = '/etc/letsencrypt/live/stockwaremini.sassayer.com/privkey.pem'
-    const fullCert = '/etc/letsencrypt/live/stockwaremini.sassayer.com/fullchain.pem'
+    const keyCert = '/etc/letsencrypt/live/easycaisse.sassayer.com/privkey.pem'
+    const fullCert = '/etc/letsencrypt/live/easycaisse.sassayer.com/fullchain.pem'
     const httpsOptions = {
       key: fs.readFileSync(keyCert),
       cert: fs.readFileSync(fullCert)
@@ -111,8 +111,8 @@ const startServer = async () => {
 ║   ✅ HTTPS Server running on port ${PORT}              ║
 ║   Environment: ${process.env.NODE_ENV || 'production'}                       ║
 ║                                                       ║
-║   🔒 Secure: https://stockwaremini.sassayer.com                  ║
-║   🏥 Health Check: https://stockwaremini.sassayer.com/health     ║
+║   🔒 Secure: https://easycaisse.sassayer.com                  ║
+║   🏥 Health Check: https://easycaisse.sassayer.com/health     ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
       `);
