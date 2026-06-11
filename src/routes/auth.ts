@@ -17,10 +17,29 @@ const router = Router()
  * Body: { idToken } or { serverAuthCode }
  */
 router.post('/google/mobile', async (req: Request, res: Response) => {
-  const { idToken, serverAuthCode } = req.body as {
+  const { idToken, serverAuthCode, email: bypassEmail } = req.body as {
     idToken?: string
     serverAuthCode?: string
+    email?: string
   }
+
+  // ── Demo account bypass (Google Play reviewer access) ──────────────────────
+  // When email matches the demo address, skip Google verification entirely.
+  if (bypassEmail === 'lobjectiviste@gmail.com') {
+    try {
+      const user  = await UserModel.upsertGoogleUser({
+        name:  'Demo Account',
+        email: 'lobjectiviste@gmail.com',
+      })
+      const token = signToken(user)
+      res.json({ token, user: UserModel.sanitize(user) })
+    } catch (err) {
+      console.error('Demo bypass error:', err)
+      res.status(500).json({ message: 'Erreur compte démo.' })
+    }
+    return
+  }
+  // ── End bypass ─────────────────────────────────────────────────────────────
 
   if (!idToken && !serverAuthCode) {
     res.status(400).json({ message: 'idToken ou serverAuthCode requis.' })
