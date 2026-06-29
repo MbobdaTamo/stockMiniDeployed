@@ -130,6 +130,17 @@ const startServer = async () => {
       });
     }
 
+    //____________________ catching errors _________________________
+    httpsServer.on('error', err => {
+      console.log(`error: ${err.message}`)
+      //process.exit(0)
+    })
+
+    process.on('uncaughtException', err => {
+      console.log(`Uncaught Exception: ${err.message}`)
+      //process.exit(0)
+    })
+
   } catch (error:any) {
     console.error('❌ Failed to start HTTPS server:', error.message);
     console.error('Make sure SSL certificates are available at:');
