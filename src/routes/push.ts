@@ -41,7 +41,7 @@ router.post('/register', requireAuth, async (req: Request | any, res: Response) 
 
     // Subscribe to the daily-reminder FCM topic
     await messaging.subscribeToTopic([token], 'daily-reminder')
-
+    console.log("token "+token)
     res.json({ ok: true })
   } catch (err) {
     console.error('[Push] Register error:', err)
