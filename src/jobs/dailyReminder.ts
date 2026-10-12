@@ -3,7 +3,7 @@ import { messaging } from '../utils/firebase'
 
 // ── Send to a FCM topic ───────────────────────────────────────────────────────
 
-async function sendReminder(hour: '9' | '18'): Promise<void> {
+async function sendReminder(hour: string): Promise<void> {
   const isEvening = hour === '18'
   console.log('sending-- reminder')
   try {
