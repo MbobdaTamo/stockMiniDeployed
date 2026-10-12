@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import type { User } from '../models/UserModel'
 
 const SECRET     = process.env.JWT_SECRET     || 'dev_secret_change_me'
-const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
+const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '3650d'
 
 export interface JwtPayload {
   sub:    number

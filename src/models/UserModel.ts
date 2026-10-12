@@ -11,6 +11,7 @@ export interface User {
   email:    string
   shopId:   string | null   // UUID string, generated on first Google login
   premiumExpireAt: Date | null
+  createdAt: Date | null
 }
 
 type UserRow = User & RowDataPacket
@@ -92,6 +93,7 @@ export const UserModel = {
       login:    null,
       email:    data.email,
       shopId,
+      createdAt: new Date()
     }
   },
 

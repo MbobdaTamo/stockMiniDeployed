@@ -39,7 +39,7 @@ async function migrate(): Promise<void> {
       MODIFY COLUMN type ENUM('admin', 'casher', 'superAdmin') NOT NULL DEFAULT 'casher';
     `)
     // Create super admin manually ----------------------
-    await conn.execute(`
+/*     await conn.execute(`
       INSERT INTO user (name, type, login, email, password, shopId, premiumExpireAt)
         VALUES (
           'Super Admin',
@@ -50,8 +50,24 @@ async function migrate(): Promise<void> {
           NULL,
           NULL
         );
-    `)
+    `) */
     // generate hash password:  node -e "require('bcryptjs').hash('dembele2000', 12).then(console.log)"
+     await conn.execute(`
+      ALTER TABLE user
+      ADD COLUMN IF NOT EXISTS pin      VARCHAR(4)   NULL,
+      ADD COLUMN IF NOT EXISTS password VARCHAR(255) NULL,
+      ADD COLUMN IF NOT EXISTS createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+    `)
+    // -------- adding push token ------------
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS push_token (
+        id     INT AUTO_INCREMENT PRIMARY KEY,
+        userId INT          NOT NULL,
+        token  VARCHAR(512) NOT NULL,
+        UNIQUE KEY uq_token (token),
+        FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
+      )
+    `) 
 
   } finally {
     conn.release()

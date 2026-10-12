@@ -7,6 +7,9 @@ import authRouter from './routes/auth'
 import syncRouter from './routes/sync'
 import adminRouter from './routes/admin'
 import path from 'path'
+import { startDailyReminderJob } from './jobs/dailyReminder'
+import pushRouter from './routes/push'
+
 
 const app  = express()
 const PORT = Number(process.env.PORT) || 3000
@@ -34,6 +37,7 @@ app.use('/sync', syncRouter)
 
 app.use('/admin', adminRouter)
 
+app.use('/push', pushRouter)
 // ── 404 ──────────────────────────────────────────────────────────────────────
 
 app.use((_req, res) => res.status(404).json({ message: 'Route introuvable.' }))
@@ -51,4 +55,13 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀  Auth server running on http://localhost:${PORT}`)
 })
 
+
+// Start cron after DB is ready
+startDailyReminderJob()
+//____________________ catching errors _________________________
+
+process.on('uncaughtException', err => {
+  console.log(`Uncaught Exception: ${err.message}`)
+  //process.exit(0)
+})
 export default app

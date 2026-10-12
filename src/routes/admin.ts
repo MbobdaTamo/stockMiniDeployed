@@ -46,7 +46,7 @@ router.get('/users', requireSuperAdmin, async (_req: Request, res: Response) => 
     const [rows] = await pool.execute<RowDataPacket[]>(`
       SELECT
         id, name, type, login, email, shopId,
-        premiumExpireAt
+        premiumExpireAt, createdAt
       FROM user
       ORDER BY id DESC
     `)
@@ -71,6 +71,7 @@ router.get('/users', requireSuperAdmin, async (_req: Request, res: Response) => 
         login:           u.login,
         email:           u.email,
         shopId:          u.shopId,
+        createdAt:       u.createdAt,
         premiumExpireAt: u.premiumExpireAt
                            ? new Date(u.premiumExpireAt).toISOString()
                            : null,

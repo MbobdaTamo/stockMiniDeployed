@@ -7,6 +7,8 @@ import authRouter from './routes/auth'
 import syncRouter from './routes/sync'
 import adminRouter from './routes/admin'
 import path from 'path'
+import pushRouter from './routes/push'
+import { startDailyReminderJob } from './jobs/dailyReminder'
 
 // production
 import https from 'https';
@@ -54,6 +56,8 @@ app.use('/sync', syncRouter)
 
 app.use('/admin', adminRouter)
 
+app.use('/push', pushRouter)
+
 app.use(express.static(path.join(__dirname, '..','public')))
 app.get('*', (req, res) => {
   res.sendFile(
@@ -100,7 +104,9 @@ const startServer = async () => {
     };
 
     // Create HTTPS server
-    const httpsServer = https.createServer(httpsOptions, app);
+    const httpsServer = https.createServer(httpsOptions, app);    
+    // Start cron after DB is ready
+    startDailyReminderJob()
     
     httpsServer.listen(PORT, () => {
       console.log(`
