@@ -24,6 +24,7 @@ const router = Router()
 // ─────────────────────────────────────────────────────────────────────────────
 
 router.post('/register', requireAuth, async (req: Request | any, res: Response) => {
+   console.log('registering ton notification ----------------')
   const { token } = req.body as { token?: string }
   if (!token) { res.status(400).json({ message: 'token requis.' }); return }
 

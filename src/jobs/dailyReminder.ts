@@ -5,7 +5,7 @@ import { messaging } from '../utils/firebase'
 
 async function sendReminder(hour: '9' | '18'): Promise<void> {
   const isEvening = hour === '18'
-
+  console.log('sending-- reminder')
   try {
     const response = await messaging.send({
       topic: 'daily-reminder',
