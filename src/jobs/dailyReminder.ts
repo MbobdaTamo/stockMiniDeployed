@@ -5,14 +5,13 @@ import { messaging } from '../utils/firebase'
 
 async function sendReminder(hour: string): Promise<void> {
   const isEvening = hour === '18'
-  console.log('sending-- reminder')
   try {
     const response = await messaging.send({
       topic: 'daily-reminder',
       notification: {
         title: isEvening ? '📊 Récapitulatif du jour' : '☀️ Bonne journée !',
         body:  isEvening
-          ? 'Pensez à enregistrer vos transactions du jour dans Stockware.'
+          ? 'Pensez à enregistrer vos transactions du jour dans Easycaisse.'
           : 'Commencez la journée en consultant votre solde de caisse.',
       },
       data: {
